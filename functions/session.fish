@@ -72,11 +72,7 @@ function __session_toggle_private_mode
             set -g __session_fish_private_mode 1
             set -g fish_history private_"$fish_session"_$fish_pid
 
-            if test $fish_session = default
-                set hfile $__fish_user_data_dir/fish_history
-            else
-                set hfile $__fish_user_data_dir/"$fish_session"_history
-            end
+            set hfile $__fish_user_data_dir/"$fish_session"_history
             set private_hfile $__fish_user_data_dir/"$fish_history"_history
 
             if test -f $hfile -a ! -f $private_hfile
