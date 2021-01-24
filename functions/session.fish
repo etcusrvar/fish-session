@@ -4,9 +4,7 @@ function session -d "Work with fish sessions and private mode"
     argparse $options -- $argv
 
     if set -q _flag_help
-        echo "Usage: session [COMMAND]
-
-If called without a COMMAND, prints the current session name.
+        echo "Usage: session COMMAND
 
 Commands:
     is-private-mode      Exit status is 0 if private mode is enabled; 1 otherwise
@@ -17,8 +15,6 @@ Commands:
     end
 
     switch $argv[1]
-        case ""
-            __session_name
         case is-private-mode
             if set -q __session_fish_private_mode_settable
                 set -q fish_private_mode
@@ -34,20 +30,6 @@ Commands:
 
     end
 
-end
-
-
-function __session_name
-    if set -q __session_fish_private_mode_settable
-        echo $fish_history
-    else if set -q __session_fish_private_mode
-        and not set -q fish_private_mode
-        echo $__session_fish_history
-    else if set -q __session_fish_history
-        echo $__session_fish_history
-    else
-        echo $fish_history
-    end
 end
 
 
@@ -78,57 +60,38 @@ function __session_toggle_private_mode
             set -g fish_private_mode 1
         end
 
-    else if set -q __session_fish_private_mode
-
-        set -e __session_fish_private_mode
-
-        if set -q __session_fish_history
-            set -g fish_history $__session_fish_history
-        else if not set -q fish_private_mode
-            set -e fish_history
-        end
-
-        set -e __session_fish_history
-
     else
 
-        set -g __session_fish_private_mode 1
+        if set -q __session_fish_private_mode
 
-        if set -q fish_history
-            set -g __session_fish_history $fish_history
-            switch $fish_history
-                case ""
-                    # don't set token
-                case default fish
-                    set token fish
-                case \*
-                    set token $fish_history
-            end
+            set -e __session_fish_private_mode
+            set -g fish_history $fish_session
+
         else
-            set token fish
-        end
 
-        if set -q token
+            set -g __session_fish_private_mode 1
+            set -g fish_history private_"$fish_session"_$fish_pid
 
-            set -g fish_history private_"$token"_$fish_pid
-
-            set hfile $__fish_user_data_dir/"$token"_history
+            if test $fish_session = default
+                set hfile $__fish_user_data_dir/fish_history
+            else
+                set hfile $__fish_user_data_dir/"$fish_session"_history
+            end
             set private_hfile $__fish_user_data_dir/"$fish_history"_history
 
-            if test -f "$hfile" -a ! -f "$private_hfile"
+            if test -f $hfile -a ! -f $private_hfile
                 cp $hfile $private_hfile
             end
 
             if not functions -q __session_fish_exit_rm_private_history
                 function __session_fish_exit_rm_private_history -e fish_exit -V private_hfile
-                    if test -f "$private_hfile"
+                    if test -f $private_hfile
                         rm $private_hfile
                     end
                 end
             end
 
         end
-
     end
 
     commandline -f repaint
