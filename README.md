@@ -1,3 +1,6 @@
+Archived. Superseded by [fish-profile](https://github.com/etcusrvar/fish-profile).
+
+---
 # fish-session
 
 A function to help with using multiple fish [history sessions](https://fishshell.com/docs/current/cmds/history.html#customizing-the-name-of-the-history-file) and [private mode](https://fishshell.com/docs/current/index.html#private-mode).
